@@ -185,15 +185,22 @@ jobs:
 
           echo "✅ ECS service is now stable!"
 
-    rollback:
+  rollback:
     name: Rollback to Previous Version
     runs-on: ubuntu-latest
     if: github.event.inputs.rollback == 'true'
 
     steps:
-      # … your AWS credentials steps above …
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
 
-      # Get current task definition (you already have that) …
+      # Get current task definition
       - name: Get current task definition
         id: current-task-def
         run: |
@@ -205,7 +212,7 @@ jobs:
           echo "current-task-def=$CURRENT_TASK_DEF" >> $GITHUB_OUTPUT
           echo "📍 Current task definition: $CURRENT_TASK_DEF"
 
-      # List available task definition revisions (you already have that) …
+      # List available task definition revisions
       - name: List available task definition revisions
         run: |
           echo "📋 Available task definition revisions (latest 5):"
@@ -217,14 +224,13 @@ jobs:
             --query 'taskDefinitionArns[*]' \
             --output table
 
-      # ————————————————
-      # 👉 Replace just this line below:
+      # Roll back to the specified revision number
       - name: Rollback to specified revision
         run: |
           TARGET_REVISION="${{ github.event.inputs.target_revision }}"
 
-          # ← Only change “payroll-task” to “payroll-service” here
-          TARGET_TASK_DEF="arn:aws:ecs:us-east-1:133039549257:task-definition/payroll-service:$TARGET_REVISION"
+          # Replace “payroll-service” with the actual ECS task‐definition family name:
+          TARGET_TASK_DEF="arn:aws:ecs:us-east-1:133039549257:task-definition/payroll-task:$TARGET_REVISION"
 
           echo "⚠️  ROLLBACK INITIATED"
           echo "🎯 Rolling back to revision: $TARGET_REVISION"
@@ -239,6 +245,7 @@ jobs:
 
           echo "✅ Rollback initiated successfully!"
 
+
       # Wait for rollback to stabilize
       - name: Monitor rollback deployment
         run: |
@@ -248,7 +255,6 @@ jobs:
             --services $ECS_SERVICE
 
           echo "✅ Rollback completed successfully!"
-
 
   notify:
     name: Notify Results
