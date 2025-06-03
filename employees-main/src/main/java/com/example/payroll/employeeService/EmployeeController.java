@@ -33,14 +33,24 @@ class EmployeeController {
   //     throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "Fetching all employees is not implemented");
   // }
 
-      @GetMapping("/employees")
-    public ResponseEntity<Void> all() {
-        throw new ResponseStatusException(
-            HttpStatus.NOT_IMPLEMENTED,
-            "Fetching all employees is not implemented"
-        );
-    }
+    //   @GetMapping("/employees")
+    // public ResponseEntity<Void> all() {
+    //     throw new ResponseStatusException(
+    //         HttpStatus.NOT_IMPLEMENTED,
+    //         "Fetching all employees is not implemented"
+    //     );
+    // }
 
+
+
+
+        @GetMapping("/employees")
+    public ResponseEntity<Void> all() {
+        
+        return ResponseEntity
+                .status(HttpStatus.NOT_IMPLEMENTED)
+                .build();
+    }
 
   @PostMapping("/employees")
   ResponseEntity<?> newEmployee(@RequestBody EmployeeDTO newEmployee) {
