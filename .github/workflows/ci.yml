@@ -228,7 +228,9 @@ jobs:
       - name: Rollback to specified revision
         run: |
           TARGET_REVISION="${{ github.event.inputs.target_revision }}"
-          TARGET_TASK_DEF="arn:aws:ecs:us-east-1:133039549257:task-definition/payroll-service:$TARGET_REVISION"
+
+          # Replace “payroll-service” with the actual ECS task‐definition family name:
+          TARGET_TASK_DEF="arn:aws:ecs:us-east-1:133039549257:task-definition/payroll-task:$TARGET_REVISION"
 
           echo "⚠️  ROLLBACK INITIATED"
           echo "🎯 Rolling back to revision: $TARGET_REVISION"
@@ -242,6 +244,7 @@ jobs:
             --output text
 
           echo "✅ Rollback initiated successfully!"
+
 
       # Wait for rollback to stabilize
       - name: Monitor rollback deployment
